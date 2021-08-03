@@ -1,0 +1,11 @@
+Flask
+click
+itsdangerous
+Jinja2
+MarkupSafe
+Werkzeug
+flask-restful
+opencensus
+tenacity
+pymysql
+pytz
