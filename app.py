@@ -151,7 +151,6 @@ class Object(Queryable,ftpfunc):
 	def get(self, multi):
 		args = {}
 		args['id'] = multi
-		args = parser.parse_args()
 		result = self.executeQueryJson("get", args)
 		return result, 200
 
@@ -171,10 +170,7 @@ class Object(Queryable,ftpfunc):
 			if args['note'] == None:
 				args['note'] = ''
 			result = self.executeQueryJson("post", args)
-			parser.add_argument('image', type=FileStorage, location='files')
-			args = parser.parse_args()
-			if not args['image'] == None:
-				self.upload(args['image'],args['id'])
+			
 		elif multi == 'multi':
 			parser.add_argument('args',type = dict,action="append")
 			args = parser.parse_args()['args']
@@ -241,6 +237,11 @@ class Objects(Queryable):
 
 class Img(ftpfunc):
 	def post(self, id):
+		parser.add_argument('image', type=FileStorage, location='files')
+		args = parser.parse_args()
+		self.upload(args['image'],id)
+		return send_file(io.BytesIO(args['image']),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
+	def get(self, id):
 		img = self.download(id)
 		if not img:
 			return json.dumps({'message':'no image'}), 200
