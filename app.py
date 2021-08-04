@@ -1,3 +1,4 @@
+import ftplib
 import sys
 import os
 import json
@@ -17,6 +18,7 @@ from pytz import timezone
 import time
 import logging
 from threading import Lock
+from ftplib import FTP
 
 app = Flask(__name__)
 
@@ -39,7 +41,30 @@ def after_request(response):
 app.after_request(after_request)
 app.config['PROPAGATE_EXCEPTIONS'] = True
 
+class ftpfunc():
+	def connect(self):
+		ftp = FTP('clecdeMac-mini.local')
+		ftp.login('GDLab','8TRcrZ')
+		ftp.cwd('img')
+		return ftp
+	
+	def upload(self, file, id):
+		ftp = self.connect()
+		ftp.storbinary("STOR "+id+".jpg",file,1024)
+		ftp.quit()
 
+	def download(self, id):
+		ftp = self.connect()
+		file = None
+		try:
+			ftp.retrbinary("RETR "+id+".jpg",file,1024)
+		except:
+			ftp.quit()
+			return False
+		ftp.quit()
+		return file
+
+	
 class ConnectionManager(object):
 	__instance = None
 	__connection = None
@@ -122,9 +147,10 @@ class Login(Queryable):
 			result = json.dumps({'message':'incorrect username or password'})
 		return result, 200
 
-class Object(Queryable):
-	def get(self):
-		parser.add_argument('id')
+class Object(Queryable,ftpfunc):
+	def get(self, multi):
+		args = {}
+		args['id'] = multi
 		args = parser.parse_args()
 		result = self.executeQueryJson("get", args)
 		return result, 200
@@ -145,6 +171,10 @@ class Object(Queryable):
 			if args['note'] == None:
 				args['note'] = ''
 			result = self.executeQueryJson("post", args)
+			parser.add_argument('image', type=FileStorage, location='files')
+			args = parser.parse_args()
+			if not args['image'] == None:
+				self.upload(args['image'],args['id'])
 		elif multi == 'multi':
 			parser.add_argument('args',type = dict,action="append")
 			args = parser.parse_args()['args']
@@ -164,9 +194,9 @@ class Object(Queryable):
 		return result, 200
 
 class Borrow(Queryable):
-	def get(self):
-		parser.add_argument('id')
-		args = parser.parse_args()
+	def get(self, id):
+		args = {}
+		args['id'] = id
 		result = self.executeQueryJson("get", args)
 		return result, 200
 
@@ -186,9 +216,9 @@ class Borrowing(Queryable):
 		return result, 200
 
 class Return(Queryable):
-	def get(self):
-		parser.add_argument('id')
-		args = parser.parse_args()
+	def get(self, id):
+		args = {}
+		args['id'] = id
 		result = self.executeQueryJson("get", args)
 		return result, 200
 
@@ -208,12 +238,19 @@ class Objects(Queryable):
 		elif type == 'instock':
 			result = self.executeQueryJson("get_instock")
 		return result, 200
-	
+
+class Img(ftpfunc):
+	def post(self, id):
+		img = self.download(id)
+		if not img:
+			return json.dumps({'message':'no image'}), 200
+		else:
+			return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
 
 api.add_resource(Login, '/login')
 api.add_resource(Object, '/object','/object/<multi>')
 api.add_resource(Objects, '/objects','/objects/<type>')
-api.add_resource(Borrow, '/borrow')
+api.add_resource(Borrow, '/borrow', '/borrow/<id>')
 api.add_resource(Borrowing, '/borrowing')
 api.add_resource(Return, '/return')
 
