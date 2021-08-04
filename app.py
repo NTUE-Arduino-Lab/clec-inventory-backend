@@ -235,7 +235,7 @@ class Objects(Queryable):
 			result = self.executeQueryJson("get_instock")
 		return result, 200
 
-class Img(ftpfunc):
+class Img(Queryable ,ftpfunc):
 	def post(self, id):
 		parser.add_argument('image', type=FileStorage, location='files')
 		args = parser.parse_args()
@@ -254,7 +254,7 @@ api.add_resource(Objects, '/objects','/objects/<type>')
 api.add_resource(Borrow, '/borrow', '/borrow/<id>')
 api.add_resource(Borrowing, '/borrowing')
 api.add_resource(Return, '/return')
-api.add_resource(Img, '/img', '/img/<id>')
+api.add_resource(Img, '/img/<id>')
 
 
 if __name__ == '__main__':
