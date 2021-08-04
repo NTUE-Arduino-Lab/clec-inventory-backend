@@ -31,7 +31,8 @@ def NowTime():
 def after_request(response):
 	response.headers['Access-Control-Allow-Origin'] = '*'
 	response.headers['Access-Control-Allow-Methods'] = 'PUT,GET,PATCH,DELETE,POST'
-	response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+	response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,Referrer-Policy'
+
 	return response
 
 
