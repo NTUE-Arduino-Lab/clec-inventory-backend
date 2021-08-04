@@ -82,7 +82,6 @@ class ConnectionManager(object):
 			for r in cursor.fetchall():
 				for inr in r:
 					raw = raw + inr
-			print(raw)
 			result = json.loads(raw)
 
 		except pymysql.Error as e:
@@ -129,17 +128,32 @@ class Object(Queryable):
 		result = self.executeQueryJson("get", args)
 		return result, 200
 
-	def post(self):
-		parser.add_argument('id')
-		parser.add_argument('year')
-		parser.add_argument('appellation')
-		parser.add_argument('buydate')
-		parser.add_argument('source')
-		parser.add_argument('unit')
-		parser.add_argument('keeper')
-		parser.add_argument('note')
-		args = parser.parse_args()
-		result = self.executeQueryJson("post", args)
+	def post(self, multi = None):
+		result = {}
+		if multi == None:
+			parser.add_argument('id')
+			parser.add_argument('year')
+			parser.add_argument('appellation')
+			parser.add_argument('buydate')
+			parser.add_argument('source')
+			parser.add_argument('unit')
+			parser.add_argument('keeper')
+			parser.add_argument('note')
+			args = parser.parse_args()
+			args['status'] = 'in stock'
+			if args['note'] == None:
+				args['note'] = ''
+			result = self.executeQueryJson("post", args)
+		elif multi == 'multi':
+			parser.add_argument('args',type = dict,action="append")
+			args = parser.parse_args()['args']
+			print(args)
+			result = []
+			for i in args:
+				i['status'] = 'in stock'
+				if i['note'] == None:
+					i['note'] = ''
+				result.append(self.executeQueryJson("post", i))
 		return result, 200
 
 	def delete(self):
@@ -186,13 +200,18 @@ class Return(Queryable):
 		return result, 200
 
 class Objects(Queryable):
-	def get(self):
-		result = self.executeQueryJson("get")
+	def get(self, type = None):
+		result = {}
+		if type == None:
+			result = self.executeQueryJson("get")
+		elif type == 'instock':
+			result = self.executeQueryJson("get_instock")
 		return result, 200
-		
+	
+
 api.add_resource(Login, '/login')
-api.add_resource(Object, '/object')
-api.add_resource(Objects, '/objects')
+api.add_resource(Object, '/object','/object/<multi>')
+api.add_resource(Objects, '/objects','/objects/<type>')
 api.add_resource(Borrow, '/borrow')
 api.add_resource(Borrowing, '/borrowing')
 api.add_resource(Return, '/return')
