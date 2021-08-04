@@ -254,6 +254,7 @@ api.add_resource(Objects, '/objects','/objects/<type>')
 api.add_resource(Borrow, '/borrow', '/borrow/<id>')
 api.add_resource(Borrowing, '/borrowing')
 api.add_resource(Return, '/return')
+api.add_resource(Img, '/img', '/img/<id>')
 
 
 if __name__ == '__main__':
