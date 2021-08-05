@@ -245,11 +245,14 @@ class Img(Queryable ,ftpfunc):
 		os.remove(imgpath)
 		return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 	def get(self, id):
-		file = open('file', 'wb')
+		file = open('file.jpg', 'wb')
 		img = self.download(file, id)
 		if img == False:
 			return {"message":"no image"}, 200
 		else:
+			file.close()
+			file = open('file.jpg', 'rb')
+			os.remove('file.jpg')
 			return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 
 api.add_resource(Login, '/login')
