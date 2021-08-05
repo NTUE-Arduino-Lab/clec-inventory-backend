@@ -250,7 +250,7 @@ class Img(Queryable ,ftpfunc):
 		if img == False:
 			return {"message":"no image"}, 200
 		else:
-			return send_file(io.BytesIO(img.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
+			return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 
 api.add_resource(Login, '/login')
 api.add_resource(Object, '/object','/object/<multi>')
