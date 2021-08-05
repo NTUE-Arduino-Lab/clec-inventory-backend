@@ -172,7 +172,6 @@ class Object(Queryable,ftpfunc):
 		elif multi == 'multi':
 			parser.add_argument('args',type = dict,action="append")
 			args = parser.parse_args()['args']
-			print(args)
 			result = []
 			for i in args:
 				i['status'] = 'in stock'
@@ -195,13 +194,11 @@ class Borrow(Queryable):
 		return result, 200
 
 	def post(self):
-		parser.add_argument('id')
-		parser.add_argument('date')
-		parser.add_argument('name')
-		parser.add_argument('phone')
-		parser.add_argument('borrowdeal')
-		args = parser.parse_args()
-		result = self.executeQueryJson("post", args)
+		parser.add_argument('args',type = dict,action="append")
+		args = parser.parse_args()['args']
+		result = []
+		for i in args:
+			result.append(self.executeQueryJson("post", i))
 		return result, 200
 
 class Borrowing(Queryable):
@@ -217,11 +214,11 @@ class Return(Queryable):
 		return result, 200
 
 	def post(self):
-		parser.add_argument('id')
-		parser.add_argument('date')
-		parser.add_argument('returndeal')
-		args = parser.parse_args()
-		result = self.executeQueryJson("post", args)
+		parser.add_argument('args',type = dict,action="append")
+		args = parser.parse_args()['args']
+		result = []
+		for i in args:
+			result.append(self.executeQueryJson("post", i))
 		return result, 200
 
 class Objects(Queryable):
