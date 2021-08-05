@@ -245,7 +245,7 @@ class Img(Queryable ,ftpfunc):
 		os.remove(imgpath)
 		return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 	def get(self, id):
-		file = open('file', 'w')
+		file = open('file', 'wb')
 		img = self.download(file, id)
 		if img == False:
 			return {"message":"no image"}, 200
