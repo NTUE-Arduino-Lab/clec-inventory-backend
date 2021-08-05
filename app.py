@@ -50,7 +50,7 @@ class ftpfunc():
 	
 	def upload(self, file, id):
 		ftp = self.connect()
-		ftp.storbinary("STOR "+id+".jpg",file,1024)
+		ftp.storbinary("STOR "+id,file,1024)
 		ftp.quit()
 
 	def download(self, file, id):
