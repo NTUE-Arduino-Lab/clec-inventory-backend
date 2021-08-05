@@ -56,12 +56,11 @@ class ftpfunc():
 	def download(self, file, id):
 		ftp = self.connect()
 		try:
-			ftp.retrbinary("RETR "+id+".jpg",file.write,1024)
+			ftp.retrbinary("RETR "+id+".jpg",file.write)
 		except:
 			ftp.quit()
 			return False
 		ftp.quit()
-		return file
 
 	
 class ConnectionManager(object):
@@ -246,13 +245,12 @@ class Img(Queryable ,ftpfunc):
 		os.remove(imgpath)
 		return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 	def get(self, id):
-		with open('file', 'w') as file:
-			img = self.download(file, id)
-			if img == False:
-				return json.dumps({'message':'no image'}), 200
-			else:
-				file.close()
-				return send_file(io.BytesIO(img.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
+		file = open('file', 'w')
+		img = self.download(file, id)
+		if img == False:
+			return {"message":"no image"}, 200
+		else:
+			return send_file(io.BytesIO(img.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 
 api.add_resource(Login, '/login')
 api.add_resource(Object, '/object','/object/<multi>')
