@@ -242,7 +242,7 @@ class Img(Queryable ,ftpfunc):
 		self.upload(img,id)
 		return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
 	def get(self, id):
-		with open('file', 'wd') as file:
+		with open('file', 'w') as file:
 			img = self.download(file, id)
 			if not img:
 				return json.dumps({'message':'no image'}), 200
