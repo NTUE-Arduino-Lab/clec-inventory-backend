@@ -238,9 +238,13 @@ class Img(Queryable ,ftpfunc):
 	def post(self, id):
 		parser.add_argument('image', type=FileStorage, location='files')
 		args = parser.parse_args()
-		img = args['image'].read()
-		self.upload(img,id)
-		return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
+		imgpath = id+'.jpg'
+		img = args['image'].save(imgpath)
+		del img
+		file = open(imgpath,'rb')
+		self.upload(file,imgpath)
+		os.remove(imgpath)
+		return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 	def get(self, id):
 		with open('file', 'w') as file:
 			img = self.download(file, id)
@@ -248,7 +252,7 @@ class Img(Queryable ,ftpfunc):
 				return json.dumps({'message':'no image'}), 200
 			else:
 				file.close()
-				return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
+				return send_file(io.BytesIO(img.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 
 api.add_resource(Login, '/login')
 api.add_resource(Object, '/object','/object/<multi>')
