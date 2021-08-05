@@ -185,6 +185,19 @@ class Object(Queryable,ftpfunc):
 		args = parser.parse_args()
 		result = self.executeQueryJson("delete", args)
 		return result, 200
+	
+	def patch(self):
+		parser.add_argument('id')
+		parser.add_argument('year')
+		parser.add_argument('appellation')
+		parser.add_argument('buydate')
+		parser.add_argument('source')
+		parser.add_argument('unit')
+		parser.add_argument('keeper')
+		parser.add_argument('note')
+		args = parser.parse_args()
+		result = self.executeQueryJson("patch", args)
+		return result, 200
 
 class Borrow(Queryable):
 	def get(self, id):
