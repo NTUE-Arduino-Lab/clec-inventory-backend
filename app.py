@@ -53,11 +53,10 @@ class ftpfunc():
 		ftp.storbinary("STOR "+id+".jpg",file,1024)
 		ftp.quit()
 
-	def download(self, id):
+	def download(self, file, id):
 		ftp = self.connect()
-		file = None
 		try:
-			ftp.retrbinary("RETR "+id+".jpg",file,1024)
+			ftp.retrbinary("RETR "+id+".jpg",file.write(),1024)
 		except:
 			ftp.quit()
 			return False
@@ -239,14 +238,17 @@ class Img(Queryable ,ftpfunc):
 	def post(self, id):
 		parser.add_argument('image', type=FileStorage, location='files')
 		args = parser.parse_args()
-		self.upload(args['image'],id)
-		return send_file(io.BytesIO(args['image']),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
+		img = args['image'].read()
+		self.upload(img,id)
+		return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
 	def get(self, id):
-		img = self.download(id)
-		if not img:
-			return json.dumps({'message':'no image'}), 200
-		else:
-			return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
+		with open('file', 'wd') as file:
+			img = self.download(file, id)
+			if not img:
+				return json.dumps({'message':'no image'}), 200
+			else:
+				file.close()
+				return send_file(io.BytesIO(img),mimetype='image/jpeg',as_attachment=True,attachment_filename='%s.jpg' % id)
 
 api.add_resource(Login, '/login')
 api.add_resource(Object, '/object','/object/<multi>')
