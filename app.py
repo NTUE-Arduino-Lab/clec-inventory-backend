@@ -107,7 +107,7 @@ class ConnectionManager(object):
 				for inr in r:
 					raw = raw + inr
 			result = json.loads(raw)
-
+			print(result)
 		except pymysql.Error as e:
 			if isinstance(e, pymysql.ProgrammingError) or isinstance(e, pymysql.OperationalError):
 				app.logger.error(f"{e.args[1]}")

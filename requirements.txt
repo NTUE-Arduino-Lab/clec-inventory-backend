@@ -9,3 +9,4 @@ opencensus
 tenacity
 pymysql
 pytz
+cryptography
