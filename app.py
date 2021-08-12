@@ -43,7 +43,7 @@ app.config['PROPAGATE_EXCEPTIONS'] = True
 
 class ftpfunc():
 	def connect(self):
-		ftp = FTP('clecdeMac-mini.local')
+		ftp = FTP('gdlab-dev.local')
 		ftp.login('GDLab','8TRcrZ')
 		ftp.cwd('img')
 		return ftp
@@ -76,7 +76,7 @@ class ConnectionManager(object):
 	def __getConnection(self):
 		if (self.__connection == None):
 			db_settings = {
-				"host": "clecdeMac-mini.local",
+				"host": "gdlab-dev.local",
 				"port": 3306,
 				"user": "clec",
 				"password": "jCLP4x",
