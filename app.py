@@ -1,4 +1,5 @@
 import ftplib
+import re
 import sys
 import os
 import json
@@ -203,6 +204,7 @@ class Borrow(Queryable):
 	def post(self):
 		parser.add_argument('args',type = dict,action="append")
 		args = parser.parse_args()['args']
+		print(args)
 		result = []
 		for i in args:
 			result.append(self.executeQueryJson("post", i))
@@ -259,6 +261,26 @@ class Img(Queryable ,ftpfunc):
 			os.remove('file.jpg')
 			return send_file(io.BytesIO(file.read()),mimetype='image/jpeg',as_attachment=True,download_name='%s.jpg' % id)
 
+class Search(Queryable):
+	def get(self, keyword):
+		key = keyword.split(',')
+		result = []
+		for i in key:
+			args = {}
+			args['keyword'] = i
+			temp = self.executeQueryJson("get", args)
+			for t in temp:
+				if t in result:
+					result.append(t)
+		return result, 200
+
+class History(Queryable):
+	def get(self, id):
+		args = {}
+		args['id'] = id
+		result = self.executeQueryJson("get", args)
+		return result, 200
+
 api.add_resource(Login, '/login')
 api.add_resource(Object, '/object','/object/<multi>')
 api.add_resource(Objects, '/objects','/objects/<type>')
@@ -266,7 +288,8 @@ api.add_resource(Borrow, '/borrow', '/borrow/<id>')
 api.add_resource(Borrowing, '/borrowing')
 api.add_resource(Return, '/return')
 api.add_resource(Img, '/img/<id>')
-
+api.add_resource(Search, '/search/<keyword>')
+api.add_resource(History, '/history/<id>')
 
 if __name__ == '__main__':
 	app.run(host='0.0.0.0', port=80)
