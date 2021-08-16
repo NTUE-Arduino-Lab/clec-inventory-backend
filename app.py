@@ -264,13 +264,14 @@ class Img(Queryable ,ftpfunc):
 class Search(Queryable):
 	def get(self, keyword):
 		key = keyword.split(',')
+		print(key)
 		result = []
 		for i in key:
 			args = {}
 			args['keyword'] = i
 			temp = self.executeQueryJson("get", args)
 			for t in temp:
-				if t in result:
+				if not t in result:
 					result.append(t)
 		return result, 200
 
